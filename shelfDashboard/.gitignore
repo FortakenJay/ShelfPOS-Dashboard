@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+out/
+.output/
+.vinxi/
+build/
+
+# Bundler / framework caches
+.vite/
+.tanstack/
+
+# Environment & secrets (keep *.example / .example.env tracked)
+.env
+.env.*
+!.env.example
+!.example.env
+!**/.env.example
+!**/.example.env
+!**/sync.env.example
+sync.env
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# POS license keys (local only)
+private/
+
+# SQLite WAL sidecars
+*.db-shm
+*.db-wal
+
+# Test / coverage
+coverage/
+
+# TypeScript incremental
+*.tsbuildinfo
+
+# Graphify (https://graphify.net/) — commit graphify-out/; keep local cost log out
+graphify-out/cost.json

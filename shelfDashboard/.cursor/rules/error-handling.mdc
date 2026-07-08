@@ -1,0 +1,35 @@
+---
+description: User-facing error handling for ShelfPOS. Use when adding IPC handlers, validating business rules, or showing errors in the renderer.
+alwaysApply: true
+---
+
+# Error handling
+
+ShelfPOS surfaces errors to cashiers via i18n keys — never raw exception text.
+
+## Rules
+
+1. **Main process (IPC):** throw `AppError('errors.someKey', { name: '…' })` for every expected failure. Never `throw new Error(...)` in handlers — that becomes `errors.unknown` ("Error inesperado").
+
+2. **Locales:** every `AppError` key must exist in both `src/shared/locales/es.json` and `zh-CN.json` under the same path.
+
+3. **Be specific:** prefer a domain key over a generic one.
+   - Stock is 0 → `errors.outOfStock`
+   - Cart qty > available → `errors.insufficientStock`
+   - Bad form field → `errors.invalidInput`
+   - Avoid `errors.unknown` for predictable business rules.
+
+4. **Validate twice:** renderer may block early (toast); IPC must enforce again inside a DB transaction (authoritative).
+
+5. **Inventory sales:** before decrementing stock, check `product.stock >= quantity`. Use a conditional `UPDATE … WHERE stock >= ?` and treat `changes === 0` as `errors.outOfStock` (race-safe).
+
+6. **SQLite catches:** map known failures to `AppError` in `catch` — e.g. `UNIQUE` → `errors.barcodeExists`, `FOREIGN KEY` → `errors.productInUse`.
+
+7. **Renderer:** use `toastApiError(toasts, err)` so `ApiError.vars` interpolate into translated messages.
+
+## Checklist for new features
+
+- [ ] Failure paths throw `AppError` with a dedicated key
+- [ ] Keys added to `es.json` and `zh-CN.json`
+- [ ] Renderer shows the key (not `errors.unknown`) for that path
+- [ ] No silent negative stock on sales

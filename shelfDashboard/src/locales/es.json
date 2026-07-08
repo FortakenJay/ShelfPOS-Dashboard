@@ -1,0 +1,677 @@
+{
+  "common": {
+    "retry": "Reintentar",
+    "refresh": "Actualizar",
+    "refreshing": "Actualizando…",
+    "switchLanguage": "Cambiar idioma",
+    "dash": "—",
+    "vsPrevious": "vs anterior",
+    "noData": "Sin datos",
+    "total": "Total",
+    "actions": "Acciones",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "loading": "Cargando…",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "date": "Fecha"
+  },
+  "nav": {
+    "admin": "Administración",
+    "dashboard": "Panel",
+    "reports": "Reportes",
+    "cashMovements": "Movimiento de efectivo",
+    "cierres": "Cierres",
+    "audit": "Bitácora",
+    "linkPos": "Vincular POS",
+    "logout": "Cerrar sesión",
+    "menu": "Menú",
+    "stores": "Tiendas",
+    "adminOnline": "Admin en línea",
+    "collapseSidebar": "Contraer menú",
+    "expandSidebar": "Expandir menú",
+    "operatorPortal": "Portal de operador",
+    "operatorBadge": "Operador de plataforma",
+    "operatorMenu": "Plataforma",
+    "supportMenu": "Soporte de tiendas",
+    "supportView": "Vista soporte"
+  },
+  "roles": {
+    "sales": "Cajero",
+    "product_manager": "Inventario",
+    "admin": "Administrador"
+  },
+  "login": {
+    "subtitle": "Panel administrativo",
+    "email": "Correo",
+    "password": "Contraseña",
+    "submit": "Iniciar sesión",
+    "submitting": "Entrando…",
+    "missingEnv": "Faltan VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en <code>.env.local</code>.",
+    "missingEnvProd": "Faltan VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en <code>.env.local</code> (local) o en Vercel (producción)."
+  },
+  "createAccount": {
+    "subtitle": "Crear cuenta de dueño (enlace exclusivo)",
+    "submit": "Crear cuenta",
+    "success": "Cuenta creada. Revise su correo si Supabase pide confirmación, luego inicie sesión y vincule su POS.",
+    "goLogin": "Ir a iniciar sesión",
+    "alreadyHaveAccount": "¿Ya tiene cuenta? Inicie sesión",
+    "backToLogin": "Volver a iniciar sesión",
+    "invalidInvite": "Enlace de registro inválido o expirado. Solicite un enlace nuevo.",
+    "disabled": "El registro por enlace no está configurado en este servidor."
+  },
+  "acceptInvite": {
+    "subtitle": "Defina su contraseña para activar su cuenta de dueño",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "submit": "Activar cuenta",
+    "saving": "Guardando…",
+    "backToLogin": "Ir a iniciar sesión",
+    "passwordTooShort": "La contraseña debe tener al menos 6 caracteres.",
+    "passwordMismatch": "Las contraseñas no coinciden.",
+    "errors": {
+      "missing_callback": "Enlace de invitación inválido o incompleto. Solicite uno nuevo.",
+      "session_missing": "La sesión expiró. Abra el enlace de invitación de nuevo (no recargue esta página).",
+      "expired": "El enlace expiró. Solicite una invitación nueva al operador.",
+      "invalid": "No se pudo validar la invitación. Solicite un enlace nuevo."
+    }
+  },
+  "resetPassword": {
+    "subtitle": "Elija una nueva contraseña para su cuenta de dueño",
+    "password": "Nueva contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "submit": "Guardar contraseña",
+    "saving": "Guardando…",
+    "backToLogin": "Ir a iniciar sesión",
+    "passwordTooShort": "La contraseña debe tener al menos 6 caracteres.",
+    "passwordMismatch": "Las contraseñas no coinciden.",
+    "errors": {
+      "missing_callback": "Enlace de restablecimiento inválido o incompleto. Solicite uno nuevo.",
+      "session_missing": "La sesión expiró. Abra el enlace de restablecimiento de nuevo (no recargue esta página).",
+      "expired": "El enlace expiró. Solicite un restablecimiento nuevo al operador.",
+      "invalid": "No se pudo validar el enlace. Solicite uno nuevo."
+    }
+  },
+  "operatorPortal": {
+    "title": "Portal de operador",
+    "subtitle": "Gestione dueños de tienda e invitaciones. Usted no vincula cajas desde aquí — eso lo hace cada dueño en su cuenta.",
+    "inviteTitle": "Invitar dueño de tienda",
+    "inviteIntro": "Supabase genera un enlace temporal de un solo uso. El dueño define su contraseña y luego vincula su POS.",
+    "ownerEmail": "Correo del dueño",
+    "ownerEmailPlaceholder": "dueno@tienda.com",
+    "generateInvite": "Generar enlace",
+    "generating": "Generando…",
+    "sendInviteEmail": "Enviar invitación por correo",
+    "sending": "Enviando…",
+    "inviteGenerated": "Enlace de invitación generado",
+    "inviteEmailSent": "Invitación enviada por correo",
+    "inviteEmailFailedWithLink": "Supabase no pudo enviar el correo (configure SMTP). Enlace generado — cópielo y envíelo al dueño.",
+    "inviteFor": "Enlace para {{email}}",
+    "inviteExpires": "Expira: {{date}}",
+    "copyInvite": "Copiar enlace",
+    "inviteCopied": "Enlace copiado",
+    "inviteCopyFailed": "No se pudo copiar el enlace",
+    "inviteStepShare": "Genere o envíe la invitación al dueño.",
+    "inviteStepOwner": "El dueño abre el enlace, crea su contraseña e inicia sesión.",
+    "inviteStepPos": "El dueño genera un código de vinculación en su panel y lo usa en ShelfPOS Sync.",
+    "resetTitle": "Restablecer contraseña de dueño",
+    "resetIntro": "Para dueños que ya tienen cuenta. Supabase envía un enlace de un solo uso para elegir una nueva contraseña.",
+    "generateReset": "Generar enlace",
+    "resetGenerating": "Generando…",
+    "sendResetEmail": "Enviar correo de restablecimiento",
+    "resetSending": "Enviando…",
+    "resetGenerated": "Enlace de restablecimiento generado",
+    "resetEmailSent": "Correo de restablecimiento enviado",
+    "resetFor": "Enlace para {{email}}",
+    "resetExpires": "Expira: {{date}}",
+    "copyReset": "Copiar enlace",
+    "resetCopied": "Enlace copiado",
+    "resetCopyFailed": "No se pudo copiar el enlace",
+    "resetStepShare": "Genere o envíe el enlace al dueño.",
+    "resetStepOwner": "El dueño abre el enlace y define su nueva contraseña.",
+    "storesTitle": "Tiendas en la plataforma",
+    "storesIntro": "Dueños vinculados, estado del POS y cobros. Marque «Pagó» para avanzar el próximo vencimiento.",
+    "storesEmpty": "Aún no hay tiendas. Cuando un dueño vincule su primera caja, aparecerá aquí.",
+    "storesLoadFailed": "No se pudo cargar la lista de tiendas",
+    "colStore": "Tienda",
+    "colOwner": "Dueño (auth)",
+    "colBillingEmail": "Correo de cobro",
+    "colInterval": "Periodo",
+    "colNextPayment": "Próximo cobro",
+    "colPaid": "Pagó",
+    "colActions": "Acciones",
+    "noOwnerEmail": "Sin dueño vinculado",
+    "billingInterval": {
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "annual": "Anual"
+    },
+    "billingPaidYes": "Pagado",
+    "billingPaidNo": "Pendiente",
+    "markPaid": "Marcar pagó",
+    "markingPaid": "Marcando…",
+    "markedPaid": "Pago registrado",
+    "billingSaved": "Cobro guardado",
+    "billingDiscordHint": "Los avisos a Discord se envían 7 días antes y el día del cobro si el estado sigue «Pendiente». Configure DISCORD_BILLING_WEBHOOK_URL y un cron diario en POST /api/cron/billing-reminders.",
+    "errors": {
+      "unauthorized": "Sesión inválida. Cierre sesión y vuelva a entrar.",
+      "forbidden": "Solo el operador de plataforma puede invitar dueños.",
+      "invalid_email": "Correo inválido.",
+      "owner_already_exists": "Ese correo ya tiene cuenta. El dueño puede iniciar sesión directamente.",
+      "invite_failed": "No se pudo crear la invitación.",
+      "invite_link_failed": "Supabase no devolvió un enlace de invitación.",
+      "secret_key_not_configured": "Configure SUPABASE_SECRET_KEY en .env.local (Supabase → Settings → API Keys → Secret key) y reinicie el servidor.",
+      "secret_key_invalid": "SUPABASE_SECRET_KEY rechazada por Supabase. Use la Secret key (sb_secret_…) del mismo proyecto que VITE_SUPABASE_URL.",
+      "redirect_not_allowed": "URL de redirección no permitida. En Supabase → Authentication → URL Configuration agregue su origen + /accept-invite (p. ej. http://localhost:3000/accept-invite y https://shelfpos.net/accept-invite).",
+      "invite_email_failed": "Supabase no pudo enviar el correo. Configure SMTP en Authentication → SMTP o use «Generar enlace» y comparta el enlace manualmente."
+    },
+    "resetErrors": {
+      "unauthorized": "Sesión inválida. Cierre sesión y vuelva a entrar.",
+      "forbidden": "Solo el operador de plataforma puede restablecer contraseñas.",
+      "invalid_email": "Correo inválido.",
+      "owner_not_found": "No hay cuenta con ese correo. Use invitar dueño para cuentas nuevas.",
+      "reset_failed": "No se pudo crear el restablecimiento.",
+      "reset_link_failed": "Supabase no devolvió un enlace de restablecimiento.",
+      "secret_key_not_configured": "Configure SUPABASE_SECRET_KEY en .env.local y reinicie el servidor."
+    },
+    "storesErrors": {
+      "unauthorized": "Sesión inválida.",
+      "forbidden": "Solo el operador de plataforma puede editar cobros.",
+      "stores_load_failed": "No se pudo cargar tiendas.",
+      "store_not_found": "Tienda no encontrada.",
+      "invalid_input": "Datos de cobro inválidos.",
+      "billing_interval_required": "Defina el periodo de cobro antes de marcar pagó.",
+      "billing_update_failed": "No se pudo guardar el cobro.",
+      "secret_key_not_configured": "Configure SUPABASE_SECRET_KEY en .env.local."
+    }
+  },
+  "status": {
+    "online": "En línea",
+    "offline": "Sin conexión",
+    "noActivity": "sin actividad",
+    "noPosSignal": "sin señal previa del POS",
+    "lastSignal": "última señal"
+  },
+  "relative": {
+    "justNow": "hace un momento",
+    "minutes": "hace {{count}} min",
+    "hours": "hace {{count}} h",
+    "days": "hace {{count}} d"
+  },
+  "errors": {
+    "loadDashboard": "No se pudo cargar el panel",
+    "loadCierres": "Error al cargar cierres",
+    "loadAudit": "Error al cargar bitácora",
+    "loadMovements": "Error al cargar movimientos de efectivo",
+    "loadReports": "Error al cargar reportes",
+    "pdfExportFailed": "No se pudo generar el PDF",
+    "facturaPdfFailed": "No se pudo generar la factura PDF",
+    "facturaPdfNotFound": "Venta no encontrada",
+    "xlsxExportFailed": "No se pudo generar el Excel",
+    "noStoresTitle": "Vincule su primera tienda",
+    "noStoresIntro": "Use este código al instalar ShelfPOS Sync en la caja. El instalador lo pedirá automáticamente.",
+    "noStoresRefresh": "Ya instalé — actualizar",
+    "noStoresLoadFailed": "No se pudo consultar la lista de tiendas. Compruebe la conexión a Supabase e intente de nuevo.",
+    "noStoresChecklistTitle": "Pasos en la PC de la caja",
+    "noStoresStepInstall": "Ejecute Install-ShelfPOS (después del instalador de ShelfPOS).",
+    "noStoresStepCode": "Cuando pida el código de vinculación, pegue el código de arriba.",
+    "noStoresStepFinish": "Al terminar, pulse «Ya instalé — actualizar» en este panel."
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "description": "La ruta que buscó no existe o fue movida. Use el menú lateral o vuelva al panel.",
+    "backHome": "Ir al panel"
+  },
+  "dashboard": {
+    "overviewTitle": "Resumen",
+    "overviewDesc": "Indicadores clave de la tienda seleccionada",
+    "profitHint": "Datos sincronizados desde la tienda (solo lectura).",
+    "paymentsMonth": "Pagos del mes",
+    "outOfStockList": "Sin existencias",
+    "viewAudit": "Ver bitácora completa",
+    "viewAllAlerts": "Ver todas las alertas",
+    "viewAllProducts": "Ver todos los productos",
+    "viewAllLowStock": "Ver todo el stock bajo",
+    "viewOutOfStock": "Ver sin existencias",
+    "tabs": {
+      "label": "Secciones del panel",
+      "home": "Inicio",
+      "analytics": "Analítica",
+      "inventory": "Inventario",
+      "team": "Equipo"
+    },
+    "sections": {
+      "salesAnalytics": "Analítica de ventas",
+      "salesAnalyticsDesc": "Tendencias de ingresos, transacciones y métodos de pago.",
+      "productAnalytics": "Analítica de productos",
+      "productAnalyticsDesc": "Rendimiento por producto del mes.",
+      "inventoryAnalytics": "Analítica de inventario",
+      "inventoryAnalyticsDesc": "Valor, salud del stock y productos críticos.",
+      "employees": "Gestión de empleados",
+      "employeesDesc": "Desempeño y actividad del equipo.",
+      "activityAlerts": "Actividad y alertas",
+      "activityAlertsDesc": "Eventos recientes sincronizados desde la tienda.",
+      "homeCharts": "Resumen visual",
+      "homeChartsDesc": "Tendencia de ingresos, métodos de pago y ventas por hora."
+    },
+    "charts": {
+      "revenueTrend": "Tendencia de ingresos",
+      "transactionTrend": "Volumen de transacciones",
+      "paymentMethods": "Métodos de pago",
+      "salesByHour": "Ventas por hora",
+      "categoryPerformance": "Rendimiento por categoría",
+      "last30Days": "Últimos 30 días",
+      "today": "Hoy",
+      "thisMonth": "Este mes",
+      "stockMovement": "Movimiento de stock",
+      "inventoryHealth": "Salud del inventario"
+    },
+    "activity": {
+      "title": "Actividad reciente",
+      "sale": "Venta registrada"
+    },
+    "alerts": {
+      "title": "Centro de alertas",
+      "none": "Sin alertas pendientes",
+      "lowStock": "{{count}} productos con stock bajo",
+      "outOfStock": "{{count}} productos sin existencias",
+      "negativeStock": "{{count}} productos con stock negativo",
+      "cierreDiscrepancy": "{{count}} cierres con diferencia de efectivo"
+    },
+    "employees": {
+      "overview": "Resumen de empleados",
+      "total": "Total empleados",
+      "active": "Empleados activos",
+      "roles": "Por rol",
+      "performance": "Desempeño por cajero (mes)",
+      "rolesAccess": "Roles y permisos",
+      "recentActivity": "Actividad reciente del equipo",
+      "name": "Empleado",
+      "transactions": "Transacciones",
+      "volume": "Volumen de ventas",
+      "avgTicket": "Ticket promedio",
+      "roster": "Equipo",
+      "rosterEmpty": "No hay usuarios sincronizados. Abra ShelfPOS en la caja y reinicie el servicio ShelfPOS Sync.",
+      "roleColumn": "Rol",
+      "statusColumn": "Estado",
+      "statusActive": "Activo",
+      "statusInactive": "Inactivo"
+    },
+    "roles": {
+      "adminDesc": "Acceso completo: panel, reportes, configuración, bitácora y exportación.",
+      "salesDesc": "Caja, efectivo, cierre de caja y cola de impresión.",
+      "pmDesc": "Gestión de productos, inventario e importación."
+    },
+    "inventory": {
+      "title": "Resumen de inventario",
+      "totalProducts": "Productos",
+      "activeProducts": "Activos (con stock)",
+      "costValue": "Valor a costo",
+      "retailValue": "Valor al detalle",
+      "outOfStock": "Sin existencias",
+      "lowStock": "Stock bajo"
+    },
+    "lowStock": {
+      "title": "Productos con stock bajo",
+      "sku": "SKU / Código",
+      "minimum": "Mínimo",
+      "status": "Estado"
+    },
+    "outOfStock": {
+      "title": "Productos sin existencias"
+    },
+    "recentInventory": {
+      "title": "Inventario actualizado recientemente"
+    },
+    "stockStatus": {
+      "healthy": "Normal",
+      "low": "Bajo",
+      "critical": "Crítico",
+      "negative": "Negativo"
+    },
+    "salesToday": "Ventas hoy",
+    "salesMonth": "Ventas del mes",
+    "txToday": "Transacciones hoy",
+    "avgTicket": "Ticket promedio",
+    "salesTrend": "Tendencia de ventas (30 días)",
+    "paymentsToday": "Pagos hoy",
+    "topProductsMonth": "Top productos del mes",
+    "inventorySummary": "Resumen inventario",
+    "activeProducts": "Productos activos",
+    "costValue": "Valor a costo",
+    "retailValue": "Valor al detalle",
+    "lowStockList": "Stock bajo",
+    "noSales30": "Sin ventas en los últimos 30 días",
+    "noProductsMonth": "Sin productos vendidos este mes",
+    "noLowStock": "Ningún producto con stock bajo",
+    "method": "Método",
+    "transactions": "Transacciones",
+    "total": "Total",
+    "product": "Producto",
+    "sku": "SKU",
+    "units": "Unidades",
+    "revenue": "Ingresos",
+    "stock": "Existencias",
+    "viewTaxReport": "Ver reporte fiscal",
+    "topProducts": {
+      "title": "Más vendidos (mes)",
+      "units": "Unidades",
+      "revenue": "Ingresos",
+      "profit": "Utilidad"
+    },
+    "slowProducts": {
+      "title": "Rotación lenta (mes)"
+    },
+    "worstSellers": {
+      "title": "Menor rendimiento (mes)"
+    },
+    "recentProducts": {
+      "title": "Agregados recientemente (mes)"
+    },
+    "tax": {
+      "title": "Resumen fiscal (mes)",
+      "taxable": "Ventas gravadas",
+      "ivaCollected": "IVA recaudado",
+      "monthlyLiability": "IVA estimado del mes"
+    }
+  },
+  "reports": {
+    "title": "Reportes",
+    "subtitle": "Detalle exportable alineado con el panel de administración.",
+    "description": "Ventas y pagos de la tienda seleccionada (solo lectura)",
+    "today": "Hoy",
+    "week": "Semana",
+    "month": "Mes",
+    "last7": "Últimos 7 días",
+    "thisMonth": "Este mes",
+    "txCount": "Transacciones",
+    "sales": "Ventas",
+    "avgTicket": "Ticket promedio",
+    "discounts": "Descuentos",
+    "paymentsMonth": "Pagos del mes",
+    "topProductsMonth": "Top productos (mes)",
+    "profitHint": "La utilidad bruta usa el costo actual del producto (no el costo histórico de cada venta).",
+    "exportExcel": "Descargar Excel",
+    "exportingExcel": "Generando Excel...",
+    "exportPdf": "Descargar PDF",
+    "exportingPdf": "Generando PDF...",
+    "pdf": {
+      "title": "Reporte",
+      "store": "Tienda",
+      "type": "Tipo",
+      "range": "Rango",
+      "generatedAt": "Generado"
+    },
+    "types": {
+      "summary": "Resumen de ventas",
+      "byPayment": "Ingresos por método de pago",
+      "topProducts": "Productos más vendidos",
+      "inventory": "Inventario actual",
+      "taxBreakdown": "Desglose de IVA",
+      "transactionLog": "Registro de transacciones",
+      "itemizedSales": "Ventas detalladas"
+    },
+    "tax": {
+      "regime": "Régimen",
+      "category": "Categoría",
+      "rate": "Tarifa",
+      "gross": "Total con IVA",
+      "base": "Base imponible",
+      "iva": "IVA",
+      "totalBase": "Base imponible total",
+      "totalIva": "IVA total",
+      "totalGross": "Total con IVA"
+    },
+    "presets": {
+      "today": "Hoy",
+      "week": "Esta semana",
+      "month": "Este mes"
+    },
+    "from": "Desde",
+    "to": "Hasta",
+    "summary": {
+      "dailyBreakdown": "Ventas por día",
+      "periodTotal": "Total del período",
+      "daySection": "Día {{date}}",
+      "date": "Fecha",
+      "totalRevenue": "Ingresos totales",
+      "totalDiscount": "Descuentos aplicados",
+      "txCount": "Transacciones",
+      "itemsSold": "Artículos vendidos",
+      "returnsCount": "Devoluciones",
+      "avgTicket": "Ticket promedio",
+      "grossProfit": "Utilidad bruta",
+      "openingFloat": "Fondo inicial",
+      "cashSales": "Ventas en efectivo",
+      "cashIn": "Entradas de efectivo",
+      "cashOut": "Salidas de efectivo"
+    },
+    "byPayment": {
+      "method": "Método",
+      "amount": "Monto",
+      "count": "Transacciones"
+    },
+    "top": {
+      "product": "Producto",
+      "qty": "Cantidad",
+      "revenue": "Ingresos",
+      "profit": "Utilidad",
+      "margin": "Margen"
+    },
+    "inventory": {
+      "value": "Valor",
+      "totalValue": "Valor total del inventario",
+      "products": "Productos",
+      "snapshotNote": "Instantánea actual del inventario (no filtrada por fechas)."
+    },
+    "transactionLog": {
+      "receipt": "Recibo",
+      "cashier": "Cajero",
+      "customer": "Cliente",
+      "payment": "Pago",
+      "discount": "Descuento"
+    },
+    "itemized": {
+      "product": "Producto",
+      "qty": "Cant.",
+      "unitPrice": "Precio",
+      "discount": "Descuento"
+    },
+    "facturaPdf": {
+      "download": "Factura PDF",
+      "exporting": "Generando PDF…",
+      "actions": "Acciones"
+    }
+  },
+  "products": {
+    "name": "Nombre",
+    "barcode": "Código",
+    "price": "Precio",
+    "stock": "Stock",
+    "category": "Categoría",
+    "pagination": {
+      "showing": "Mostrando {{from}}–{{to}} de {{total}}",
+      "perPage": "Por página",
+      "pageOf": "Página {{page}} de {{totalPages}}"
+    }
+  },
+  "pos": {
+    "amount": "Monto",
+    "methods": {
+      "cash": "Efectivo",
+      "card": "Tarjeta",
+      "sinpe": "SINPE"
+    }
+  },
+  "tax": {
+    "regime": {
+      "simplificado": "Simplificado",
+      "tradicional": "Tradicional"
+    },
+    "categories": {
+      "standard": "IVA general"
+    }
+  },
+  "cierre": {
+    "closedBy": "Por"
+  },
+  "cierres": {
+    "title": "Cierres de caja",
+    "description": "Historial sincronizado desde la tienda (solo lectura)",
+    "previous": "Cierres anteriores",
+    "from": "Desde",
+    "to": "Hasta",
+    "range": "Rango",
+    "rangeApplied": "Rango aplicado: {{from}} a {{to}}",
+    "filteredRangeSummary": "Rango {{from}} - {{to}} · {{count}} cierres",
+    "truncatedWarning": "Mostrando {{shown}} de {{total}} cierres. Ajuste el rango para exportar todo.",
+    "truncatedWarningUnknownTotal": "Mostrando los primeros {{shown}} cierres. Ajuste el rango para exportar todo.",
+    "downloadPdf": "Descargar PDF",
+    "exportingPdf": "Generando PDF...",
+    "savePdf": "Guardar PDF",
+    "empty": "Sin cierres registrados",
+    "id": "ID",
+    "closed": "Cierre",
+    "shift": "Turno",
+    "cashier": "Cajero",
+    "sales": "Ventas",
+    "cash": "Efectivo",
+    "card": "Tarjeta",
+    "sinpe": "Sinpe",
+    "difference": "Diferencia",
+    "notes": "Notas",
+    "pdf": {
+      "title": "Cierre de caja",
+      "store": "Tienda",
+      "range": "Rango",
+      "generatedAt": "Generado",
+      "page": "Página"
+    }
+  },
+  "linkPos": {
+    "title": "Vincular POS",
+    "description": "Cada cuenta de dueño solo ve sus propias tiendas. El código enlaza esta caja con su usuario del panel.",
+    "stepCopy": "Copie el código de vinculación (válido 24 horas).",
+    "stepInstaller": "En la PC de la caja, ejecute Install-ShelfPOS y pegue el código cuando lo pida.",
+    "stepRefresh": "Vuelva al panel y actualice — solo verá sus tiendas.",
+    "generate": "Generar código",
+    "generating": "Generando…",
+    "regenerate": "Nuevo código",
+    "codeLabel": "Código de vinculación",
+    "codeExpiry": "Expira en 24 horas. Un solo uso.",
+    "codeInstallerHint": "Péguelo en ShelfPOS → Configuración → Nube, en Install-ShelfPOS, o en sync.env como STORE_PAIRING_CODE.",
+    "copy": "Copiar código",
+    "copied": "Código copiado correctamente",
+    "goDashboard": "Ir al panel",
+    "noPending": "No hay códigos activos. Genere uno para vincular otra caja.",
+    "addRegister": "Vincular otra caja",
+    "labeledTitle": "Código con nombre (opcional)",
+    "labelOptional": "Nombre de la caja",
+    "labelPlaceholder": "Ej. Caja 2",
+    "addLabeled": "Generar código"
+  },
+  "audit": {
+    "title": "Bitácora de actividad",
+    "allTime": "Todo",
+    "allTimeSummary": "Historial completo · {{total}} registros",
+    "pageOf": "Página {{page}} de {{pages}}",
+    "pageOutOfRange": "La página actual ya no existe para este filtro.",
+    "resetPage": "Volver a la primera página",
+    "showing": "{{from}}–{{to}} de {{total}}",
+    "user": "Usuario",
+    "allUsers": "Todos los usuarios",
+    "allActions": "Todas las acciones",
+    "range": "Rango",
+    "action": "Acción",
+    "entity": "Entidad",
+    "detail": "Detalle",
+    "actions": {
+      "login": "Inicio de sesión",
+      "logout": "Cierre de sesión",
+      "sale_created": "Venta registrada",
+      "return_created": "Devolución",
+      "product_created": "Producto creado",
+      "product_updated": "Producto actualizado",
+      "product_deleted": "Producto eliminado",
+      "stock_adjusted": "Stock ajustado",
+      "cierre_confirmed": "Cierre de caja",
+      "cierre_cash_discrepancy": "Diferencia de efectivo en cierre",
+      "cash_opening_float": "Fondo de caja",
+      "cash_in": "Entrada de efectivo",
+      "cash_out": "Salida de efectivo",
+      "settings_updated": "Configuración actualizada",
+      "pin_changed": "PIN cambiado",
+      "discount_authorized_caja": "Descuento autorizado (PIN caja)",
+      "discount_authorized_manager": "Descuento autorizado (PIN gerente)",
+      "price_override_authorized_caja": "Precio modificado autorizado (PIN caja)",
+      "price_override_authorized_manager": "Precio modificado autorizado (PIN gerente)",
+      "price_override_sale": "Venta con precio modificado",
+      "cart_line_removed_caja": "Artículo quitado del carrito (PIN caja)",
+      "cart_line_removed_manager": "Artículo quitado del carrito (PIN gerente)",
+      "cart_tab_discarded_caja": "Carrito descartado (PIN caja)",
+      "cart_tab_discarded_manager": "Carrito descartado (PIN gerente)",
+      "product_label_printed": "Etiqueta de producto impresa",
+      "user_created": "Usuario creado",
+      "user_updated": "Usuario actualizado",
+      "user_deactivated": "Usuario desactivado"
+    }
+  },
+  "cash": {
+    "adminTitle": "Movimiento de efectivo",
+    "movements": "Movimientos de efectivo",
+    "type": "Tipo",
+    "reason": "Motivo",
+    "types": {
+      "opening_float": "Fondo inicial",
+      "cash_in": "Entrada",
+      "cash_out": "Salida"
+    }
+  },
+  "payment": {
+    "cash": "Efectivo",
+    "card": "Tarjeta",
+    "sinpe": "Sinpe"
+  },
+  "movements": {
+    "title": "Movimiento de efectivo",
+    "description": "Entradas, salidas y fondo inicial sincronizados (solo lectura)",
+    "empty": "Sin movimientos registrados",
+    "date": "Fecha",
+    "type": "Tipo",
+    "amount": "Monto",
+    "reason": "Motivo",
+    "cierre": "Cierre",
+    "types": {
+      "opening_float": "Fondo inicial",
+      "cash_in": "Entrada",
+      "cash_out": "Salida",
+      "unknown": "Otro"
+    },
+    "truncatedWarning": "Mostrando {{shown}} de {{total}} movimientos. Ajuste el rango para ver todo.",
+    "truncatedWarningUnknownTotal": "Mostrando los primeros {{shown}} movimientos. Ajuste el rango para ver todo."
+  },
+  "print": {
+    "receipt": {
+      "discount": "Descuento",
+      "discountTotal": "Descuento total"
+    },
+    "report": {
+      "range": "Periodo",
+      "generated": "Generado",
+      "transactions": "Transacciones",
+      "itemsSold": "Artículos vendidos",
+      "returns": "Devoluciones",
+      "avgTicket": "Ticket promedio",
+      "revenue": "Ingresos totales",
+      "totalDiscount": "Descuentos aplicados",
+      "byPayment": "Por método de pago",
+      "topProducts": "Productos más vendidos",
+      "inventoryCount": "Productos",
+      "inventoryValue": "Valor total"
+    },
+    "cierre": {
+      "cashTitle": "Conteo de efectivo",
+      "cartDiscount": "Desc. venta (carrito)"
+    }
+  }
+}

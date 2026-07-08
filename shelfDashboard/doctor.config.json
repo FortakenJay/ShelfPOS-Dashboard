@@ -1,0 +1,14 @@
+{
+  "$schema": "https://www.react.doctor/schema/doctor.config.v1.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "ignore": [
+    "dist/**",
+    "node_modules/**",
+    ".output/**",
+    "**/.output/**",
+    "**/dist/**"
+  ],
+  "rules": {
+    "react-doctor/artifact-baas-authority-surface": "off"
+  }
+}

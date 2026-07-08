@@ -1,0 +1,62 @@
+---
+description: ShelfPOS UI design system — tokens, layouts, touch targets, and component patterns for the renderer.
+globs: src/renderer/**/*.tsx,src/renderer/**/*.css
+alwaysApply: false
+---
+# ShelfPOS UI Design
+
+Retail POS for Costa Rica. **Fast, touch-friendly, utilitarian** — not generic SaaS.
+
+## Source of truth
+
+- `src/renderer/src/assets/main.css` — Tailwind v4 `@theme` tokens + globals
+- `src/renderer/src/components/ui.tsx` — Button, Input, Field, Modal, Select
+- `src/renderer/src/lib/toast.tsx` — toast placement/variants
+- `src/features/admin/dashboard/components/DashboardPrimitives.tsx` — dashboard cards/KPIs
+
+No shadcn/Radix/MUI unless explicitly requested.
+
+## Tokens (Tailwind names, not hex)
+
+| Token | Use |
+|-------|-----|
+| `chrome` | Sidebar, login backdrop |
+| `surface` | Page background |
+| `primary` | Nav active, focus, info |
+| `cta` | Pay, confirm, success |
+| `warning` / `danger` | Caution / delete / errors |
+| `line` | All `border-2` chrome |
+
+## Non-negotiable
+
+- **No CSS transitions** — disabled globally in `main.css` for counter speed
+- **Touch targets:** `min-h-[44px]` default; POS search `56px`; pay `Button size="xl"` (`68px`)
+- **Borders:** outer `border-2 border-line`; inner dividers `border-b border-line`
+- **Radius:** `rounded-md` → `rounded-lg` → `rounded-xl` (controls → sections → dashboard cards)
+- **i18n:** all copy via `t('key')`
+
+## Layouts
+
+- **Shell:** `aside w-60 bg-chrome` + `main flex-1`; active nav `bg-primary text-white rounded-md px-4 py-3`
+- **Admin pages:** `p-6`, often `max-w-6xl mx-auto`; title `text-2xl font-bold`
+- **POS:** full-height split, cart `border-r-2 border-line`, sidebar `w-80`, pay `variant="cta" size="xl" w-full`
+- **Login:** `bg-chrome` full-screen, card `rounded-xl bg-white p-8 shadow-2xl max-w-sm`
+
+## Reuse before inventing
+
+```tsx
+<Button variant="primary|cta|danger|outline|ghost" size="md|lg|xl" />
+<Field label={t('…')} error={err}><Input /></Field>
+<Modal /> | <ConfirmDialog />   // native <dialog>, no custom portals
+<DashboardCard /> | <KpiCard /> | <SectionHeading />
+```
+
+**Card recipes:** admin `rounded-lg border-2 border-line bg-white p-5`; dashboard `rounded-xl … p-5 shadow-sm hover:border-slate-300`
+
+**Toasts:** `bottom-4 right-4 w-96 border-2 shadow-lg` + left color bar; admin/product_manager only in POS.
+
+**Forms footer:** `flex justify-end gap-3` — outline cancel + semantic confirm.
+
+**KPI grid:** `grid gap-4 sm:grid-cols-2 lg:grid-cols-4`
+
+**Typography:** `text-[12px]` labels, `text-[15px]` body, `text-[16px]` inputs, `font-semibold`/`font-bold`.

@@ -1,0 +1,41 @@
+# Daily Discord pings for unpaid store billing (7 days before + on due date).
+#
+# GitHub repo → Settings → Secrets and variables → Actions:
+#   DASHBOARD_URL          — production dashboard origin, e.g. https://admin.example.com (no trailing slash)
+#   BILLING_CRON_SECRET    — same value as BILLING_CRON_SECRET on Vercel / .env.local
+#
+# Vercel (or host) must also have: SUPABASE_SECRET_KEY, DISCORD_BILLING_WEBHOOK_URL, BILLING_CRON_SECRET
+
+name: Billing reminders
+
+on:
+  schedule:
+    # 14:00 UTC daily (~08:00 Costa Rica). Adjust if you want a different hour.
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: billing-reminders
+  cancel-in-progress: false
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call billing reminders API
+        env:
+          DASHBOARD_URL: ${{ secrets.DASHBOARD_URL }}
+          BILLING_CRON_SECRET: ${{ secrets.BILLING_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DASHBOARD_URL}" ] || [ -z "${BILLING_CRON_SECRET}" ]; then
+            echo "Missing DASHBOARD_URL or BILLING_CRON_SECRET in GitHub Actions secrets."
+            exit 1
+          fi
+          BASE="${DASHBOARD_URL%/}"
+          echo "POST ${BASE}/api/cron/billing-reminders"
+          curl --fail-with-body -sS -X POST \
+            "${BASE}/api/cron/billing-reminders" \
+            -H "Authorization: Bearer ${BILLING_CRON_SECRET}" \
+            -H "Content-Type: application/json"

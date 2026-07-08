@@ -1,0 +1,157 @@
+---
+description: Feature-based CRUD architecture for React + Supabase + TanStack Query
+alwaysApply: true
+---
+
+# Feature CRUD Architecture
+
+## Folder Structure
+Every feature (products, orders, employees, etc.) follows this exact structure:
+
+```
+src/features/<feature>/
+  api/
+    <feature>.api.ts       ← raw Supabase calls, NO React, NO TanStack
+  hooks/
+    use<Feature>.ts        ← ALL TanStack Query + mutation logic
+  components/
+    <Feature>List.tsx      ← renders only, calls hook
+    <Feature>Form.tsx      ← renders only, calls hook
+    <Feature>Card.tsx      ← renders only
+  types/
+    <feature>.types.ts     ← shared types/interfaces
+```
+
+## Layer Rules
+
+### api/<feature>.api.ts
+- Pure async functions only
+- No React imports
+- No useQuery / useMutation
+- No business logic — only Supabase calls
+- Always select specific columns, NEVER `select('*')`
+
+```ts
+// ✅ correct
+export const getProducts = () =>
+  supabase.from('products').select('id, name, price, category, is_active')
+
+export const createProduct = (data: CreateProductInput) =>
+  supabase.from('products').insert(data).select().single()
+
+export const updateProduct = (id: string, data: UpdateProductInput) =>
+  supabase.from('products').update(data).eq('id', id).select().single()
+
+export const deleteProduct = (id: string) =>
+  supabase.from('products').delete().eq('id', id)
+
+// 🚨 never do this
+export const getProducts = () =>
+  supabase.from('products').select('*') // over-fetches
+```
+
+### hooks/use<Feature>.ts
+- All useQuery and useMutation calls live here
+- Always invalidate query cache on mutation success
+- Always handle onError for optimistic updates
+- Export a single hook that returns all CRUD operations
+
+```ts
+export const useProducts = () => {
+  const queryClient = useQueryClient()
+
+  const products = useQuery({
+    queryKey: ['products'],
+    queryFn: getProducts,
+  })
+
+  const create = useMutation({
+    mutationFn: createProduct,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
+  })
+
+  const update = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateProductInput }) =>
+      updateProduct(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
+  })
+
+  const remove = useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
+  })
+
+  return { products, create, update, remove }
+}
+```
+
+### components/<Feature>Form.tsx
+- No Supabase imports — ever
+- No direct fetch calls
+- Only calls the feature hook
+- One responsibility: render the form and delegate actions
+
+```tsx
+// ✅ correct
+const ProductForm = () => {
+  const { create } = useProducts()
+  return (
+    <button onClick={() => create.mutate(formData)}>Save</button>
+  )
+}
+
+// 🚨 never do this
+const ProductForm = () => {
+  // business logic in a component = wrong layer
+  const total = items.reduce((acc, i) => acc + i.price * i.qty, 0)
+  const tax = total * 0.13
+  await supabase.from('products').insert(...)
+}
+```
+
+## Key Rules (enforced on every generation)
+
+1. **Never import Supabase directly in a component** — goes through api layer
+2. **Never put math/calculations in JSX files** — goes in utils/ or api layer
+3. **Never use select('*')** — always name columns explicitly
+4. **Never put useQuery inside a .map()** — that's an N+1 query
+5. **Never write a mutation without onError handling** — race condition risk
+6. **One hook per feature** — useProducts handles ALL product CRUD
+7. **Components describe what, hooks describe how, api describes where**
+
+## N+1 Query Anti-Pattern
+
+```ts
+// 🚨 N+1 — one query fires per item
+items.map(item => {
+  const { data } = useQuery(['product', item.id], ...) // WRONG
+})
+
+// ✅ batch — one query for all items
+useQuery({
+  queryKey: ['products', itemIds],
+  queryFn: () => getProductsByIds(itemIds),
+})
+```
+
+## Business Logic Layer Rule
+
+If you find yourself writing any of the following inside a component, stop and move it:
+- `reduce()`, `filter()`, `map()` for data transformation
+- Price calculations, tax, totals, subtotals
+- Date formatting beyond display
+- Status transition logic (e.g. order state machine)
+
+These belong in `src/lib/` or `src/utils/` — not in JSX.
+
+## Query Key Convention
+
+```ts
+['products']              // all products
+['products', id]          // single product
+['products', 'active']    // filtered subset
+['orders', 'today']       // scoped by time
+['orders', userId]        // scoped by user
+```
+
+Consistent keys = predictable cache invalidation.
