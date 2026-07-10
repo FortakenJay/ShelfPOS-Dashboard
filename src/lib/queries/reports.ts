@@ -91,6 +91,18 @@ async function loadStockThresholdDefault(storeId: StoreId): Promise<number> {
   return Number.isFinite(n) && n >= 0 ? n : 5
 }
 
+/** Fraction (e.g. 0.13) — mirrors the store's configurable POS IVA rate (audit P2-N3). */
+async function loadIvaRateStandard(storeId: StoreId): Promise<number> {
+  const { data, error } = await getSupabase()
+    .from('stores')
+    .select('iva_rate_standard')
+    .eq('store_id', storeId)
+    .maybeSingle()
+  if (error) throw error
+  const n = Number(data?.iva_rate_standard)
+  return Number.isFinite(n) && n >= 0 ? n / 100 : 0.13
+}
+
 async function salesInRange(
   storeId: StoreId,
   from: string,
@@ -164,27 +176,36 @@ async function productCostsForIds(
   return new Map(rows.map((r) => [r.id, r]))
 }
 
+/**
+ * Joins through sales.user_id + the pos_users mirror rather than audit_log —
+ * audit writes are best-effort by design (owner decision P2-5) and shouldn't be
+ * the only source for a reporting feature (audit P2-N7).
+ */
 async function cashierNamesForSales(
   storeId: StoreId,
-  saleIds: number[],
+  sales: Pick<SaleRow, 'id' | 'user_id'>[],
 ): Promise<Map<number, string>> {
-  if (saleIds.length === 0) return new Map()
-  const rows = await fetchInChunks(saleIds, CHUNK_SIZE, async (chunk) => {
+  const userIds = [
+    ...new Set(sales.map((s) => s.user_id).filter((id): id is number => id != null)),
+  ]
+  if (userIds.length === 0) return new Map()
+  const userRows = await fetchInChunks(userIds, CHUNK_SIZE, async (chunk) => {
     const { data, error } = await getSupabase()
-      .from('audit_log')
-      .select('entity_id, username')
+      .from('pos_users')
+      .select('id, username')
       .eq('store_id', storeId)
-      .eq('entity', 'sale')
-      .eq('action', 'sale_created')
-      .in('entity_id', chunk.map(String))
+      .in('id', chunk)
     if (error) throw error
     return data
   })
+  const usernameById = new Map(
+    userRows.map((u) => [u.id, (u.username as string | null)?.trim() ?? '']),
+  )
   const map = new Map<number, string>()
-  for (const row of rows) {
-    const saleId = Number(row.entity_id)
-    const name = (row.username as string | null)?.trim()
-    if (saleId > 0 && name) map.set(saleId, name)
+  for (const sale of sales) {
+    if (sale.user_id == null) continue
+    const name = usernameById.get(sale.user_id)
+    if (name) map.set(sale.id, name)
   }
   return map
 }
@@ -515,9 +536,12 @@ async function runTaxBreakdown(
   storeId: StoreId,
   bounds: { from: string; to: string },
 ): Promise<TaxBreakdownReport> {
-  const sales = await salesInRange(storeId, bounds.from, bounds.to)
+  const [sales, ivaRateStandard] = await Promise.all([
+    salesInRange(storeId, bounds.from, bounds.to),
+    loadIvaRateStandard(storeId),
+  ])
   const items = await saleItemsForSaleIds(storeId, sales.map((s) => s.id))
-  return buildTaxBreakdownFromLineItems(items)
+  return buildTaxBreakdownFromLineItems(items, ivaRateStandard)
 }
 
 function cashierLabel(sale: SaleRow, cashiers: Map<number, string>): string {
@@ -535,7 +559,7 @@ async function runTransactionLog(
   const saleIds = sales.map((s) => s.id)
   const payments = await paymentsForSaleIds(storeId, saleIds)
   const paymentMap = paymentsBySale(payments)
-  const cashiers = await cashierNamesForSales(storeId, saleIds)
+  const cashiers = await cashierNamesForSales(storeId, sales)
 
   const rows = sales.map((sale) => ({
     saleId: sale.id,
@@ -563,7 +587,7 @@ async function runItemizedSales(
   const saleIds = sales.map((s) => s.id)
   const [payments, cashiers, items] = await Promise.all([
     paymentsForSaleIds(storeId, saleIds),
-    cashierNamesForSales(storeId, saleIds),
+    cashierNamesForSales(storeId, sales),
     saleItemsForSaleIds(storeId, saleIds),
   ])
   const paymentMap = paymentsBySale(payments)

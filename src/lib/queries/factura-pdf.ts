@@ -84,27 +84,46 @@ async function loadProductBarcodes(
   return new Map(rows.map((row) => [row.id, row.barcode]))
 }
 
+/**
+ * Joins through sales.user_id + the pos_users mirror rather than audit_log —
+ * audit writes are best-effort by design (owner decision P2-5) and shouldn't be
+ * the only source for a reporting/document feature (audit P2-N7).
+ */
 async function cashierNamesForSales(
   storeId: StoreId,
   saleIds: number[],
 ): Promise<Map<number, string>> {
   if (saleIds.length === 0) return new Map()
-  const rows = await fetchInChunks(saleIds, CHUNK_SIZE, async (chunk) => {
+  const saleRows = await fetchInChunks(saleIds, CHUNK_SIZE, async (chunk) => {
     const { data, error } = await getSupabase()
-      .from('audit_log')
-      .select('entity_id, username')
+      .from('sales')
+      .select('id, user_id')
       .eq('store_id', storeId)
-      .eq('entity', 'sale')
-      .eq('action', 'sale_created')
-      .in('entity_id', chunk.map(String))
+      .in('id', chunk)
     if (error) throw error
     return data
   })
+  const userIds = [
+    ...new Set(saleRows.map((s) => s.user_id).filter((id): id is number => id != null)),
+  ]
+  if (userIds.length === 0) return new Map()
+  const userRows = await fetchInChunks(userIds, CHUNK_SIZE, async (chunk) => {
+    const { data, error } = await getSupabase()
+      .from('pos_users')
+      .select('id, username')
+      .eq('store_id', storeId)
+      .in('id', chunk)
+    if (error) throw error
+    return data
+  })
+  const usernameById = new Map(
+    userRows.map((u) => [u.id, (u.username as string | null)?.trim() ?? '']),
+  )
   const map = new Map<number, string>()
-  for (const row of rows) {
-    const saleId = Number(row.entity_id)
-    const name = (row.username as string | null)?.trim()
-    if (saleId > 0 && name) map.set(saleId, name)
+  for (const sale of saleRows) {
+    if (sale.user_id == null) continue
+    const name = usernameById.get(sale.user_id)
+    if (name) map.set(sale.id, name)
   }
   return map
 }

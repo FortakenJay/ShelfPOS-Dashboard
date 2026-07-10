@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button, Field, Input } from '#/components/ui'
 import { createStorePairing } from '#/lib/queries/store-claims'
+import { useToast } from '#/lib/toast'
 
 export function StorePairingList({
   pairings,
@@ -15,6 +16,7 @@ export function StorePairingList({
 }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const { show } = useToast()
   const [label, setLabel] = useState('')
 
   const addPairing = useMutation({
@@ -23,6 +25,9 @@ export function StorePairingList({
       setLabel('')
       void queryClient.invalidateQueries({ queryKey: ['store-pairings'] })
       void queryClient.invalidateQueries({ queryKey: ['store-claim', 'active'] })
+    },
+    onError: (err) => {
+      show(err instanceof Error ? err.message : t('errors.unknown'))
     },
   })
 

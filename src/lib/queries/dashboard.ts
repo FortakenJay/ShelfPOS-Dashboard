@@ -229,6 +229,7 @@ async function monthProductAnalytics(
   storeId: StoreId,
   sales: SaleRow[],
   products: ProductLookupRow[],
+  ivaRateStandard: number,
 ): Promise<{
   topProducts: ProductPerformanceRow[]
   slowProducts: ProductPerformanceRow[]
@@ -243,7 +244,7 @@ async function monthProductAnalytics(
       slowProducts: [],
       worstSellers: [],
       categoryPerformance: [],
-      taxSummary: buildTaxBreakdownFromLineItems([]),
+      taxSummary: buildTaxBreakdownFromLineItems([], ivaRateStandard),
     }
   }
 
@@ -284,7 +285,7 @@ async function monthProductAnalytics(
   }
 
   const all = [...agg.values()]
-  const taxSummary = buildTaxBreakdownFromLineItems(items)
+  const taxSummary = buildTaxBreakdownFromLineItems(items, ivaRateStandard)
 
   return {
     topProducts: all.toSorted((a, b) => b.revenue - a.revenue).slice(0, 10),
@@ -353,16 +354,21 @@ async function loadProducts(storeId: StoreId): Promise<ProductLookupRow[]> {
   return fetchDashboardProducts(storeId)
 }
 
-async function loadStoreSettings(storeId: StoreId): Promise<{ stockThresholdDefault: number }> {
+async function loadStoreSettings(
+  storeId: StoreId,
+): Promise<{ stockThresholdDefault: number; ivaRateStandard: number }> {
   const { data, error } = await getSupabase()
     .from('stores')
-    .select('stock_threshold_default')
+    .select('stock_threshold_default, iva_rate_standard')
     .eq('store_id', storeId)
     .maybeSingle()
   if (error) throw error
   const def = Number(data?.stock_threshold_default)
+  const iva = Number(data?.iva_rate_standard)
   return {
     stockThresholdDefault: Number.isFinite(def) && def >= 0 ? def : 5,
+    // Fraction (e.g. 0.13) — mirrors the store's configurable POS IVA rate (audit P2-N3).
+    ivaRateStandard: Number.isFinite(iva) && iva >= 0 ? iva / 100 : 0.13,
   }
 }
 
@@ -633,7 +639,7 @@ async function fetchDashboard(
       storeId,
       monthSales.map((s) => s.id),
     ),
-    monthProductAnalytics(storeId, monthSales, productRows),
+    monthProductAnalytics(storeId, monthSales, productRows, storeSettings.ivaRateStandard),
   ])
 
   const paymentMonth = summarizePayments(monthPaymentRows)

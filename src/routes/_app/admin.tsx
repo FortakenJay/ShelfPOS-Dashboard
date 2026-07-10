@@ -75,6 +75,10 @@ function OperatorPortalPage() {
       show(t('operatorPortal.inviteGenerated'))
       void queryClient.invalidateQueries({ queryKey: ['operator-stores'] })
     },
+    onError: (err) => {
+      const code = err instanceof OperatorInviteError ? err.code : 'invite_failed'
+      show(t(inviteErrorKey(code)))
+    },
   })
 
   const sendEmail = useMutation({
@@ -96,6 +100,10 @@ function OperatorPortalPage() {
       }
       void queryClient.invalidateQueries({ queryKey: ['operator-stores'] })
     },
+    onError: (err) => {
+      const code = err instanceof OperatorInviteError ? err.code : 'invite_failed'
+      show(t(inviteErrorKey(code)))
+    },
   })
 
   const generateResetLink = useMutation({
@@ -109,6 +117,10 @@ function OperatorPortalPage() {
       show(t('operatorPortal.resetGenerated'))
       void queryClient.invalidateQueries({ queryKey: ['operator-stores'] })
     },
+    onError: (err) => {
+      const code = err instanceof OperatorResetError ? err.code : 'reset_failed'
+      show(t(resetErrorKey(code)))
+    },
   })
 
   const sendResetEmail = useMutation({
@@ -120,6 +132,10 @@ function OperatorPortalPage() {
     onSuccess: () => {
       show(t('operatorPortal.resetEmailSent'))
       void queryClient.invalidateQueries({ queryKey: ['operator-stores'] })
+    },
+    onError: (err) => {
+      const code = err instanceof OperatorResetError ? err.code : 'reset_failed'
+      show(t(resetErrorKey(code)))
     },
   })
 
