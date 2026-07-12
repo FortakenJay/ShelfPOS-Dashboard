@@ -1,14 +1,19 @@
 -- =============================================================================
 -- ShelfPOS Supabase schema (idempotent — safe to re-run in SQL Editor)
 --
+-- Does NOT truncate mirror data. Safe on existing projects.
+--
 -- Sections:
 --   1. Extensions + tables
 --   2. Column patches (upgrades)
 --   3. Indexes
 --   4. Functions & RPCs
---   5. Row Level Security
+--   5. Row Level Security (explicit ENABLE + policies — source of truth)
 --   6. Grants
 --   7. Legacy migration (store_claim_codes → store_pairings)
+--   8. Cleanup: drop leftover auto-RLS event triggers (ensure_rls /
+--      rls_auto_enable_trigger) and rls_auto_enable(). Does not disable
+--      table RLS from section 5.
 -- =============================================================================
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -66,6 +71,8 @@ CREATE TABLE IF NOT EXISTS public.products (
   barcode text,
   name text,
   price real,
+  price2 real,
+  price3 real,
   cost_price real,
   category text,
   stock integer,
@@ -79,6 +86,21 @@ CREATE TABLE IF NOT EXISTS public.products (
   updated_at text,
   stock_provider text,
   CONSTRAINT products_pkey PRIMARY KEY (id, store_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.customers (
+  id bigint NOT NULL,
+  store_id text NOT NULL,
+  name text NOT NULL,
+  phone text,
+  id_number text,
+  note text,
+  balance real NOT NULL DEFAULT 0,
+  is_active integer NOT NULL DEFAULT 1,
+  created_at text,
+  updated_at text,
+  deleted_at text,
+  CONSTRAINT customers_pkey PRIMARY KEY (id, store_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.sales (
@@ -98,6 +120,7 @@ CREATE TABLE IF NOT EXISTS public.sales (
   customer_phone text,
   customer_email text,
   customer_activity_code text,
+  customer_account_id bigint,
   cierre_id bigint,
   created_at text,
   CONSTRAINT sales_pkey PRIMARY KEY (id, store_id)
@@ -130,6 +153,21 @@ CREATE TABLE IF NOT EXISTS public.sale_payments (
   CONSTRAINT sale_payments_pkey PRIMARY KEY (id, store_id)
 );
 
+CREATE TABLE IF NOT EXISTS public.credit_payments (
+  id bigint NOT NULL,
+  store_id text NOT NULL,
+  customer_id bigint NOT NULL,
+  amount real NOT NULL,
+  method text NOT NULL,
+  ref text,
+  note text,
+  user_id bigint,
+  created_at text,
+  cierre_id bigint,
+  sale_id bigint,
+  CONSTRAINT credit_payments_pkey PRIMARY KEY (id, store_id)
+);
+
 CREATE TABLE IF NOT EXISTS public.cierres (
   id bigint NOT NULL,
   store_id text NOT NULL,
@@ -141,6 +179,7 @@ CREATE TABLE IF NOT EXISTS public.cierres (
   total_cash real,
   total_card real,
   total_sinpe real,
+  total_credit real NOT NULL DEFAULT 0,
   total_sales real,
   opening_float real,
   cash_in real,
@@ -219,7 +258,12 @@ CREATE TABLE IF NOT EXISTS public.pos_users (
 
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS stock_provider text;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS deleted_at text;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS price2 real;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS price3 real;
 ALTER TABLE public.sale_items ADD COLUMN IF NOT EXISTS barcode_snapshot text;
+ALTER TABLE public.sales ADD COLUMN IF NOT EXISTS customer_account_id bigint;
+ALTER TABLE public.cierres ADD COLUMN IF NOT EXISTS total_credit real NOT NULL DEFAULT 0;
+ALTER TABLE public.credit_payments ADD COLUMN IF NOT EXISTS sale_id bigint;
 ALTER TABLE public.return_items ADD COLUMN IF NOT EXISTS sale_item_id bigint;
 ALTER TABLE public.return_items ADD COLUMN IF NOT EXISTS line_total real;
 ALTER TABLE public.stores ADD COLUMN IF NOT EXISTS pos_last_seen_at text;
@@ -238,9 +282,13 @@ ALTER TABLE public.stores ADD COLUMN IF NOT EXISTS billing_reminder_due_for date
 
 CREATE INDEX IF NOT EXISTS idx_products_store_barcode ON public.products (store_id, barcode);
 CREATE INDEX IF NOT EXISTS idx_products_store_stock_provider ON public.products (store_id, stock_provider);
+CREATE INDEX IF NOT EXISTS idx_customers_store_name ON public.customers (store_id, name);
 CREATE INDEX IF NOT EXISTS idx_sales_store_created ON public.sales (store_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_sales_store_customer ON public.sales (store_id, customer_account_id);
 CREATE INDEX IF NOT EXISTS idx_sale_items_store_sale ON public.sale_items (store_id, sale_id);
 CREATE INDEX IF NOT EXISTS idx_sale_payments_store_sale ON public.sale_payments (store_id, sale_id);
+CREATE INDEX IF NOT EXISTS idx_credit_payments_store_customer ON public.credit_payments (store_id, customer_id);
+CREATE INDEX IF NOT EXISTS idx_credit_payments_store_sale ON public.credit_payments (store_id, sale_id);
 CREATE INDEX IF NOT EXISTS idx_cierres_store_closed ON public.cierres (store_id, closed_at DESC);
 CREATE INDEX IF NOT EXISTS idx_cash_movements_store_created ON public.cash_movements (store_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_audit_log_store_created ON public.audit_log (store_id, created_at DESC);
@@ -482,9 +530,11 @@ $$;
 -- -----------------------------------------------------------------------------
 
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sales ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sale_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sale_payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.credit_payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cierres ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cash_movements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_log ENABLE ROW LEVEL SECURITY;
@@ -501,7 +551,7 @@ DECLARE
   t text;
 BEGIN
   FOREACH t IN ARRAY ARRAY[
-    'products', 'sales', 'sale_items', 'sale_payments',
+    'products', 'customers', 'sales', 'sale_items', 'sale_payments', 'credit_payments',
     'cierres', 'cash_movements', 'audit_log', 'return_items',
     'stock_adjustments', 'pos_users'
   ]
@@ -629,10 +679,10 @@ BEGIN
   END IF;
 END $$;
 
--- Drop the auto-enable-RLS event trigger from earlier revisions of this file —
--- its DROP statement had invalid syntax (`DROP EVENT TRIGGER ... ON ddl_command_end`,
--- which isn't valid Postgres grammar) and privileges for CREATE EVENT TRIGGER on
--- Supabase were never confirmed. New tables must explicitly ENABLE ROW LEVEL
--- SECURITY themselves (see section 5 above).
+-- Drop the auto-enable-RLS event trigger from earlier revisions of this file.
+-- Historical names differ across environments (`rls_auto_enable_trigger`,
+-- `ensure_rls`). Drop every known trigger first, then the function.
+-- New tables must explicitly ENABLE ROW LEVEL SECURITY (see section 5 above).
 DROP EVENT TRIGGER IF EXISTS rls_auto_enable_trigger;
+DROP EVENT TRIGGER IF EXISTS ensure_rls;
 DROP FUNCTION IF EXISTS public.rls_auto_enable();
