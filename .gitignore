@@ -35,7 +35,12 @@ Thumbs.db
 # POS license keys (local only)
 private/
 
-# SQLite WAL sidecars
+# SQLite databases and WAL sidecars
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
 *.db-shm
 *.db-wal
 
@@ -45,5 +50,8 @@ coverage/
 # TypeScript incremental
 *.tsbuildinfo
 
-# Graphify (https://graphify.net/) — commit graphify-out/; keep local cost log out
-graphify-out/cost.json
+# Local tooling and generated graphs (kept on disk, not in git)
+graphify-out/
+.claude/
+.cursor/
+.cta.json
