@@ -1,6 +1,6 @@
 # ShelfPOS Dashboard
 
-Read-only owner dashboard for [ShelfPOS](https://github.com/FortakenJay/ShelfPOS). Two live stores. TanStack Start on Vercel, backed by Supabase.
+Read-only owner dashboard for [ShelfPOS](https://github.com/FortakenJay/ShelfPOS), live at [shelfpos.net](https://shelfpos.net). Two live stores. TanStack Start on Vercel, backed by Supabase. Sign-in is for store owners only, so the screenshots below show the same app running on demo data.
 
 Each register sells from its own SQLite database. ShelfPOSSync pushes those rows up. This app only reads them. Owners can see sales and inventory from anywhere. They cannot edit the register from the cloud, so an online change cannot fight what happened in the store. Rows are keyed by store, and row-level security limits each owner to their own stores.
 
