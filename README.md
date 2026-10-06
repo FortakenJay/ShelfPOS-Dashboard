@@ -4,6 +4,16 @@ Read-only owner dashboard for [ShelfPOS](https://github.com/FortakenJay/ShelfPOS
 
 Each register sells from its own SQLite database. ShelfPOSSync pushes those rows up. This app only reads them. Owners can see sales and inventory from anywhere. They cannot edit the register from the cloud, so an online change cannot fight what happened in the store. Rows are keyed by store, and row-level security limits each owner to their own stores.
 
+![Owner dashboard: today's KPIs, 30-day revenue trend, and payment mix, with a store switcher showing one register online and one offline](docs/media/dashboard-home.png)
+
+| Sales analytics | Inventory |
+|---|---|
+| ![Revenue trend, daily transaction volume, sales by hour](docs/media/dashboard-analytics.png) | ![Stock movement from supplier deliveries and inventory health](docs/media/dashboard-inventory.png) |
+| **Cash closes** | **Reports** |
+| ![Two weeks of cash closes with discrepancies highlighted](docs/media/cierres.png) | ![Sales by day with exports to Excel and PDF](docs/media/reports.png) |
+
+The screenshots use two demo stores with two weeks of generated shifts (opening float, sales, cash close), pushed through the real register app and exported with the sync service's mirror manifest. No store data.
+
 ## Setup
 
 ```bash
